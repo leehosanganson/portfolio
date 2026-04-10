@@ -1,28 +1,37 @@
 ---
-// Terminal component — Neovim-aesthetic terminal UI with character-level cursor
+interface Line {
+  content: string;
+  href?: string;
+}
+
+const lines: Line[] = [
+  { content: "Under Construction ..." },
+  { content: "github.com/leehosanganson",          href: "https://github.com/leehosanganson" },
+  { content: "linkedin.com/in/leehosanganson",     href: "https://linkedin.com/in/leehosanganson" },
+  { content: "leehosanganson@gmail.com",           href: "mailto:leehosanganson@gmail.com" },
+  { content: "" },
+  { content: "https://life-in-the-uk-quiz.leehosanganson.dev/", href: "https://life-in-the-uk-quiz.leehosanganson.dev/" },
+];
 ---
 
 <div id="terminal">
   <div id="editor">
     <div id="gutter">
-      <span class="ln" data-line="1">1</span>
-      <span class="ln" data-line="2">2</span>
-      <span class="ln" data-line="3">3</span>
-      <span class="ln" data-line="4">4</span>
+      {lines.map((_, i) => (
+        <span class="ln" data-line={i + 1}>{i + 1}</span>
+      ))}
     </div>
     <div id="buffer">
-      <div class="line" data-line="1" data-content="Under Construction ...">
-        <span class="text"></span>
-      </div>
-      <div class="line" data-line="2" data-content="github.com/leehosanganson" data-href="https://github.com/leehosanganson">
-        <span class="text"></span>
-      </div>
-      <div class="line" data-line="3" data-content="linkedin.com/in/leehosanganson" data-href="https://linkedin.com/in/leehosanganson">
-        <span class="text"></span>
-      </div>
-      <div class="line" data-line="4" data-content="leehosanganson@gmail.com" data-href="mailto:leehosanganson@gmail.com">
-        <span class="text"></span>
-      </div>
+      {lines.map((line, i) => (
+        <div
+          class="line"
+          data-line={i + 1}
+          data-content={line.content || undefined}
+          data-href={line.href || undefined}
+        >
+          <span class="text"></span>
+        </div>
+      ))}
     </div>
   </div>
 </div>
@@ -75,11 +84,13 @@
     });
 
     function lineLen(r: number): number {
-      return charSpans[r]?.length ?? 1;
+      return charSpans[r]?.length ?? 0;
     }
 
     function clampCol(r: number, c: number): number {
-      return Math.max(0, Math.min(c, lineLen(r) - 1));
+      const len = lineLen(r);
+      if (len === 0) return 0;
+      return Math.max(0, Math.min(c, len - 1));
     }
 
     function render() {
@@ -101,14 +112,14 @@
       switch (e.key) {
         case 'j':
         case 'ArrowDown':
-          row = (row + 1) % 4;
+          row = (row + 1) % lines.length;
           col = clampCol(row, col);
           render();
           e.preventDefault();
           break;
         case 'k':
         case 'ArrowUp':
-          row = (row - 1 + 4) % 4;
+          row = (row - 1 + lines.length) % lines.length;
           col = clampCol(row, col);
           render();
           e.preventDefault();
@@ -131,7 +142,7 @@
           e.preventDefault();
           break;
         case '$':
-          col = lineLen(row) - 1;
+          col = Math.max(0, lineLen(row) - 1);
           render();
           e.preventDefault();
           break;

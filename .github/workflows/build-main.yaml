@@ -42,3 +42,10 @@ jobs:
           image: ${{ vars.HARBOR_PROJECT }}/portfolio
           tags: ${{ steps.build.outputs.tags }}
           registry: ${{ vars.HARBOR_REGISTRY }}
+
+      - name: Push Image to Harbor as latest
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ vars.HARBOR_PROJECT }}/portfolio
+          tags: "latest"
+          registry: ${{ vars.HARBOR_REGISTRY }}
