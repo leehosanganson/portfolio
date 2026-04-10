@@ -1,0 +1,151 @@
+---
+// Terminal component — Neovim-aesthetic terminal UI with character-level cursor
+---
+
+<div id="terminal">
+  <div id="editor">
+    <div id="gutter">
+      <span class="ln" data-line="1">1</span>
+      <span class="ln" data-line="2">2</span>
+      <span class="ln" data-line="3">3</span>
+      <span class="ln" data-line="4">4</span>
+    </div>
+    <div id="buffer">
+      <div class="line" data-line="1" data-content="Under Construction ...">
+        <span class="text"></span>
+      </div>
+      <div class="line" data-line="2" data-content="github.com/leehosanganson" data-href="https://github.com/leehosanganson">
+        <span class="text"></span>
+      </div>
+      <div class="line" data-line="3" data-content="linkedin.com/in/leehosanganson" data-href="https://linkedin.com/in/leehosanganson">
+        <span class="text"></span>
+      </div>
+      <div class="line" data-line="4" data-content="leehosanganson@gmail.com" data-href="mailto:leehosanganson@gmail.com">
+        <span class="text"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    let row = 0;
+    let col = 0;
+
+    const lines   = Array.from(document.querySelectorAll<HTMLElement>('.line'));
+    const lnSpans = Array.from(document.querySelectorAll<HTMLElement>('.ln'));
+
+    // Build per-character spans for each line
+    // charSpans[row] = array of <span class="ch"> elements
+    const charSpans: HTMLElement[][] = [];
+
+    lines.forEach((lineEl) => {
+      const content = lineEl.dataset.content ?? '';
+      const href    = lineEl.dataset.href;
+      const textEl  = lineEl.querySelector<HTMLElement>('.text')!;
+
+      const spans: HTMLElement[] = [];
+
+      if (href) {
+        // Wrap all chars in a single <a> tag
+        const a = document.createElement('a');
+        a.href   = href;
+        a.target = '_blank';
+        a.rel    = 'noopener';
+
+        for (const char of content) {
+          const ch = document.createElement('span');
+          ch.className   = 'ch';
+          ch.textContent = char;
+          a.appendChild(ch);
+          spans.push(ch);
+        }
+        textEl.appendChild(a);
+      } else {
+        for (const char of content) {
+          const ch = document.createElement('span');
+          ch.className   = 'ch';
+          ch.textContent = char;
+          textEl.appendChild(ch);
+          spans.push(ch);
+        }
+      }
+
+      charSpans.push(spans);
+    });
+
+    function lineLen(r: number): number {
+      return charSpans[r]?.length ?? 1;
+    }
+
+    function clampCol(r: number, c: number): number {
+      return Math.max(0, Math.min(c, lineLen(r) - 1));
+    }
+
+    function render() {
+      // Row highlight
+      lines.forEach((l, i)   => l.classList.toggle('active', i === row));
+      lnSpans.forEach((l, i) => l.classList.toggle('active', i === row));
+
+      // Cursor character
+      charSpans.forEach((rowSpans, r) => {
+        rowSpans.forEach((ch, c) => {
+          ch.classList.toggle('cur-char', r === row && c === col);
+        });
+      });
+    }
+
+    render();
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'j':
+        case 'ArrowDown':
+          row = (row + 1) % 4;
+          col = clampCol(row, col);
+          render();
+          e.preventDefault();
+          break;
+        case 'k':
+        case 'ArrowUp':
+          row = (row - 1 + 4) % 4;
+          col = clampCol(row, col);
+          render();
+          e.preventDefault();
+          break;
+        case 'l':
+        case 'ArrowRight':
+          col = clampCol(row, col + 1);
+          render();
+          e.preventDefault();
+          break;
+        case 'h':
+        case 'ArrowLeft':
+          col = clampCol(row, col - 1);
+          render();
+          e.preventDefault();
+          break;
+        case '0':
+          col = 0;
+          render();
+          e.preventDefault();
+          break;
+        case '$':
+          col = lineLen(row) - 1;
+          render();
+          e.preventDefault();
+          break;
+        case 'Enter':
+          if (row > 0) {
+            const a = lines[row]?.querySelector('a');
+            if (a) a.click();
+          }
+          e.preventDefault();
+          break;
+      }
+    });
+
+    window.addEventListener('blur',  () => document.body.classList.add('paused'));
+    window.addEventListener('focus', () => document.body.classList.remove('paused'));
+  });
+</script>

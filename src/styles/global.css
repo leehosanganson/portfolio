@@ -1,0 +1,133 @@
+/* ── CSS Variables: Catppuccin Mocha ── */
+:root {
+  --bg:        #1e1e2e;
+  --fg:        #cdd6f4;
+  --cursor:    #f5e0dc;
+  --cursor-fg: #11111b;
+  --sel-bg:    #313244;
+  --comment:   #585b70;
+  --blue:      #89b4fa;
+  --green:     #a6e3a1;
+  --red:       #f38ba8;
+}
+
+/* ── Global Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(14px, 1.6vw, 18px);
+  line-height: 1.6;
+  scrollbar-width: none;
+}
+
+/* ── CRT Scanline Overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+  );
+}
+
+/* ── Terminal Layout ── */
+#terminal {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+#editor {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem 0;
+}
+
+/* ── Gutter ── */
+#gutter {
+  width: 4ch;
+  padding-right: 1ch;
+  text-align: right;
+  color: var(--comment);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.ln {
+  display: block;
+  line-height: 1.6;
+}
+
+.ln.active {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+/* ── Buffer ── */
+#buffer {
+  flex: 0 0 auto;
+  padding-left: 1ch;
+  min-width: 32ch;
+}
+
+.line {
+  display: block;
+  line-height: 1.6;
+  padding: 0 0.5ch;
+  position: relative;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.line.active {
+  background: var(--sel-bg);
+}
+
+/* ── Character spans & cursor ── */
+.ch {
+  display: inline;
+}
+
+.ch.cur-char {
+  background: var(--cursor);
+  color: var(--cursor-fg);
+  animation: blink 1.2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { background: var(--cursor); color: var(--cursor-fg); }
+  50%       { background: transparent;  color: var(--fg); }
+}
+
+.paused .ch.cur-char {
+  animation-play-state: paused;
+}
+
+/* ── Links ── */
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
