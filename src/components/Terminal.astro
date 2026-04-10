@@ -87,6 +87,8 @@ const lines: Line[] = [
       return charSpans[r]?.length ?? 0;
     }
 
+    col = Math.max(0, lineLen(0) - 1);
+
     function clampCol(r: number, c: number): number {
       const len = lineLen(r);
       if (len === 0) return 0;
