@@ -33,7 +33,7 @@ jobs:
         with:
           context: .
           image: ${{ vars.HARBOR_REGISTRY }}/${{ vars.HARBOR_PROJECT }}/portfolio
-          tags: ${{ env.SHORT_SHA }}
+          tags: ${{ env.SHORT_SHA }} latest
           containerfiles: ./Dockerfile
 
       - name: Push Image to Harbor
@@ -43,9 +43,3 @@ jobs:
           tags: ${{ steps.build.outputs.tags }}
           registry: ${{ vars.HARBOR_REGISTRY }}
 
-      - name: Push Image to Harbor as latest
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ vars.HARBOR_PROJECT }}/portfolio
-          tags: "latest"
-          registry: ${{ vars.HARBOR_REGISTRY }}
