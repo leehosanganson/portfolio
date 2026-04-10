@@ -106,6 +106,7 @@ body::after {
 /* ── Character spans & cursor ── */
 .ch {
   display: inline;
+  font-variant-ligatures: none;
 }
 
 .ch.cur-char {
@@ -116,7 +117,7 @@ body::after {
 
 @keyframes blink {
   0%, 100% { background: var(--cursor); color: var(--cursor-fg); }
-  50%       { background: transparent;  color: var(--fg); }
+  50%       { background: transparent;  color: inherit; }
 }
 
 .paused .ch.cur-char {
